@@ -1,10 +1,12 @@
 # Ansible
 ## Generando keys ssh
 $ ssh-keygen
+
 $ ssh-copy-id user@server
 
 ## Agregar agentes registrados
 En /etc/ansible/host
+
 server ansible_ssh_user=user
 
 ## Ejecución de PLAYBOOKS
