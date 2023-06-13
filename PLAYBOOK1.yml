@@ -1,0 +1,50 @@
+---
+- name: Playbook con condiciones, ciclos y más
+  hosts: tu_grupo_de_hosts
+  become: true
+
+  vars:
+    paquetes_instalar:
+      - package1
+      - package2
+    usuarios_crear:
+      - nombre: usuario1
+        shell: /bin/bash
+      - nombre: usuario2
+        shell: /bin/zsh
+
+  tasks:
+    - name: Actualizar el sistema
+      apt:
+        upgrade: yes
+        update_cache: yes
+
+    - name: Instalar paquetes necesarios
+      apt:
+        name: "{{ item }}"
+        state: present
+      loop: "{{ paquetes_instalar }}"
+
+    - name: Crear usuarios
+      user:
+        name: "{{ item.nombre }}"
+        shell: "{{ item.shell }}"
+        state: present
+      loop: "{{ usuarios_crear }}"
+
+    - name: Copiar archivo de configuración
+      copy:
+        src: archivo.conf
+        dest: /path/to/destination
+      when: "'archivo.conf' | changed"
+
+    - name: Reiniciar servicio
+      service:
+        name: nombre_servicio
+        state: restarted
+      when: "'archivo.conf' | changed or 'package1' in ansible_facts.packages"
+
+    - name: Ejemplo de ciclo
+      debug:
+        msg: "Nombre de usuario: {{ item }}"
+      loop: "{{ usuarios_crear | map(attribute='nombre') | list }}"
